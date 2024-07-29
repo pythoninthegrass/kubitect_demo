@@ -1,0 +1,91 @@
+hosts:
+  - name: nuc
+    connection:
+      type: remote
+      user: admin
+      ip: 123.456.7.8
+      ssh:
+        keyfile: ~/.ssh/id_rsa
+    mainResourcePoolPath: /var/lib/libvirt/images/
+
+cluster:
+  name: k8s-cluster
+  network:
+    mode: nat
+    cidr: 192.168.113.0/24
+  nodeTemplate:
+    user: admin
+    updateOnBoot: false     # os packages update on boot
+    ssh:
+      addToKnownHosts: true
+    os:
+      distro: ubuntu22      # ubuntu20/22, debian11/12, centos9, rocky9
+      # source: "https://cloud-images.ubuntu.com/releases/jammy/release/ubuntu-22.04-server-cloudimg-amd64.img"
+      # networkInterface: enp86s0
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+  nodes:
+    # * loadBalancer applies to control planes only
+    # * mandatory when running HA
+    loadBalancer:
+      forwardPorts:
+        - name: http
+          port: 80
+        - name: https
+          port: 443
+      instances:
+        - id: 1
+    master:
+      default:
+        cpu: 2
+        ram: 2
+        mainDiskSize: 24
+      instances:
+        - id: 1
+          ip: 192.168.113.10
+          cpu: 2
+          ram: 4
+        - id: 2
+          ip: 192.168.113.11
+          mainDiskSize: 5
+    worker:
+      default:
+        cpu: 2
+        ram: 4
+        mainDiskSize: 24
+      instances:
+        - id: 1
+          ip: 192.168.113.21
+        - id: 2
+          ip: 192.168.113.22
+          mainDiskSize: 10
+        - id: 3
+          ip: 192.168.113.23
+          mainDiskSize: 10
+
+kubernetes:
+  version: v1.28.6
+  networkPlugin: calico     # calico, cilium, flannel, kube-router
+  other:
+    mergeKubeconfig: true
+    autoRenewCertificates: true
+
+# TODO: debug
+# addons:
+#   kubespray:
+#     # Nginx ingress controller deployment
+#     ingress_nginx_enabled: true
+#     ingress_nginx_namespace: "ingress-nginx"
+#     ingress_nginx_insecure_port: 80
+#     ingress_nginx_secure_port: 443
+
+#     # MetalLB deployment
+#     metallb_enabled: true
+#     metallb_speaker_enabled: true
+#     metallb_ip_range:
+#       - "10.10.9.201-10.10.9.254"
+#     metallb_pool_name: "default"
+#     metallb_auto_assign: true
+#     metallb_version: v0.12.1
+#     metallb_protocol: "layer2"

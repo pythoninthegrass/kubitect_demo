@@ -1,8 +1,10 @@
 # ETC
+facts/*
 cluster.yaml
 
 # INCLUDE
 !**/*.example
+!**/*.gitkeep
 
 # Local .terraform directories
 **/.terraform/*

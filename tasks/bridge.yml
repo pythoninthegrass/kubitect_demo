@@ -1,0 +1,46 @@
+# code: language=ansible
+
+---
+- hosts: all
+  become: false
+  gather_facts: true
+  any_errors_fatal: true
+  vars:
+    bridge_name: "virbr2"
+    cidr: "192.168.113.1/24"
+    gateway: "{{ cidr.split('/')[0] }}"
+    os_environment:
+      - key: EDITOR
+        value: vim
+  # roles:
+  # pre_tasks:
+  tasks:
+    - name: Create bridge network with dynamic naming
+      block:
+        - name: Get list of existing bridge interfaces
+          ansible.builtin.shell:
+            "nmcli -t -f NAME con show | grep '^virbr' | sort -V"
+          register: existing_bridges
+          changed_when: false
+
+        - name: Create bridge using nmcli
+          community.general.nmcli:
+            conn_name: "{{ bridge_name }}"
+            ifname: "{{ bridge_name }}"
+            type: bridge
+            ip4: "{{ cidr }}"
+            gw4: "{{ gateway }}"
+            state: present
+          become: true
+
+      always:
+        - name: Display created bridge
+          ansible.builtin.debug:
+            msg: "Created bridge: {{ bridge_name }}"
+          when: existing_bridges.stdout_lines | length == 0
+
+        - name: Display existing bridge
+          ansible.builtin.debug:
+            msg: "Bridge {{ bridge_name }} already exists"
+          when: existing_bridges.stdout_lines | length > 0
+

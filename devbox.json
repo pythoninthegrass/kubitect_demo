@@ -1,15 +1,26 @@
 {
-    "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.12.0/.schema/devbox.schema.json",
-    "packages": [],
-    "shell": {
-      "init_hook": [
-        "echo 'Welcome to devbox!' > /dev/null"
-      ],
-      "scripts": {
-        "test": [
-          "echo \"Error: no test specified\" && exit 1"
-        ]
-      }
+  "packages": {
+    "asdf":                  "latest",
+    "go-task":               "latest",
+    "python":                "3.11",
+    "python311Packages.pip": "latest",
+    "uv":                    "latest"
+  },
+  "env": {
+    "VENV_DIR": ".venv",
+    "UV_HTTP_TIMEOUT": "150"
+  },
+  "shell": {
+    "init_hook": [
+      ". $VENV_DIR/bin/activate",
+      "uv pip install -r requirements.txt"
+    ],
+    "scripts": {
+      "install":     "task install",
+      "gen-config":  "task gen-config",
+      "export-reqs": "task export-reqs",
+      "venv":        "task venv"
     }
-  }
-  
+  },
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.12.0/.schema/devbox.schema.json"
+}

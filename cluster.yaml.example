@@ -28,14 +28,14 @@ cluster:
   nodes:
     # * loadBalancer applies to control planes only
     # * mandatory when running HA
-    loadBalancer:
-      forwardPorts:
-        - name: http
-          port: 80
-        - name: https
-          port: 443
-      instances:
-        - id: 1
+    # loadBalancer:
+    #   forwardPorts:
+    #     - name: http
+    #       port: 80
+    #     - name: https
+    #       port: 443
+    #   instances:
+    #     - id: 1
     master:
       default:
         cpu: 2
@@ -46,9 +46,12 @@ cluster:
           ip: 192.168.113.10
           cpu: 2
           ram: 4
-        - id: 2
-          ip: 192.168.113.11
-          mainDiskSize: 5
+        # - id: 2
+        #   ip: 192.168.113.11
+        #   mainDiskSize: 5
+        # - id: 3
+        #   ip: 192.168.113.12
+        #   mainDiskSize: 5
     worker:
       default:
         cpu: 2
